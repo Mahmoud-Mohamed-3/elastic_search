@@ -1,0 +1,27 @@
+<p style="color: green"><%= notice %></p>
+
+<% content_for :title, "Purchase Orders" %>
+
+<h1>Purchase Orders</h1>
+
+<%= form_tag purchase_orders_path, method: :get, role: 'search' do %>
+  <%= text_field_tag :q, params[:q], placeholder: 'Search Purchase Order...' %>
+  <%= submit_tag 'Search' %>
+<% end %>
+
+<div id="purchase_orders">
+  <% @purchase_orders.each do |purchase_order| %>
+    <div class="purchase-order">
+      <p><strong>Order Number:</strong> <%= purchase_order.order_num %></p>
+      <p><strong>Status:</strong> <%= purchase_order.status %></p>
+      <p><strong>Ship To:</strong> <%= purchase_order.ship_to_name %></p>
+      <p><strong>Sales Channel:</strong> <%= purchase_order.sales_channel %></p>
+      <p>
+        <%= link_to "Show this purchase order", purchase_order_path(purchase_order) %>
+      </p>
+    </div>
+    <hr>
+  <% end %>
+</div>
+
+<%= link_to "New Purchase Order", new_purchase_order_path %>

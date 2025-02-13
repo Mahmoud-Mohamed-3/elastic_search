@@ -1,0 +1,122 @@
+<%= form_with(model: purchase_order) do |form| %>
+  <% if purchase_order.errors.any? %>
+    <div style="color: red">
+      <h2><%= pluralize(purchase_order.errors.count, "error") %> prohibited this purchase_order from being saved:</h2>
+
+      <ul>
+        <% purchase_order.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div>
+    <%= form.label :order_num, style: "display: block" %>
+    <%= form.text_field :order_num %>
+  </div>
+
+  <div>
+    <%= form.label :purchase_date, style: "display: block" %>
+    <%= form.datetime_field :purchase_date %>
+  </div>
+
+  <div>
+    <%= form.label :status, style: "display: block" %>
+    <%= form.text_field :status %>
+  </div>
+
+  <div>
+    <%= form.label :sales_channel, style: "display: block" %>
+    <%= form.text_field :sales_channel %>
+  </div>
+
+  <div>
+    <%= form.label :order_total, style: "display: block" %>
+    <%= form.text_field :order_total %>
+  </div>
+
+  <div>
+    <%= form.label :num_items_shipped, style: "display: block" %>
+    <%= form.number_field :num_items_shipped %>
+  </div>
+
+  <div>
+    <%= form.label :num_items_unshipped, style: "display: block" %>
+    <%= form.number_field :num_items_unshipped %>
+  </div>
+
+  <div>
+    <%= form.label :payment_method, style: "display: block" %>
+    <%= form.text_field :payment_method %>
+  </div>
+
+  <div>
+    <%= form.label :shipped_at, style: "display: block" %>
+    <%= form.datetime_field :shipped_at %>
+  </div>
+
+  <div>
+    <%= form.label :shipping_price, style: "display: block" %>
+    <%= form.text_field :shipping_price %>
+  </div>
+
+  <div>
+    <%= form.label :shipping_tax, style: "display: block" %>
+    <%= form.text_field :shipping_tax %>
+  </div>
+
+  <div>
+    <%= form.label :carrier, style: "display: block" %>
+    <%= form.text_field :carrier %>
+  </div>
+
+  <div>
+    <%= form.label :tracking_number, style: "display: block" %>
+    <%= form.text_field :tracking_number %>
+  </div>
+
+  <div>
+    <%= form.label :estimated_arrival_date, style: "display: block" %>
+    <%= form.datetime_field :estimated_arrival_date %>
+  </div>
+
+  <div>
+    <%= form.label :fulfillment_center, style: "display: block" %>
+    <%= form.text_field :fulfillment_center %>
+  </div>
+
+  <div>
+    <%= form.label :confirmed_at, style: "display: block" %>
+    <%= form.datetime_field :confirmed_at %>
+  </div>
+
+  <div>
+    <%= form.label :returned_date, style: "display: block" %>
+    <%= form.datetime_field :returned_date %>
+  </div>
+
+  <div>
+    <%= form.label :return_reason, style: "display: block" %>
+    <%= form.textarea :return_reason %>
+  </div>
+
+  <div>
+    <%= form.label :returned_at, style: "display: block" %>
+    <%= form.datetime_field :returned_at %>
+  </div>
+
+  <div>
+    <%= form.label :ship_to_name, style: "display: block" %>
+    <%= form.text_field :ship_to_name %>
+  </div>
+
+  <div>
+    <%= form.label :ship_to_address, style: "display: block" %>
+    <%= form.text_field :ship_to_address %>
+  </div>
+
+  <div>
+    <%= form.submit %>
+  </div>
+<% end %>

@@ -1,0 +1,25 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  order_item: MyString
+  purchase_order: one
+  item: one
+  currancy: MyString
+  quantitiy_added: 1
+  quantity_shipped: 1
+  price: 1.5
+  discount: 1.5
+  tax: 1.5
+  platform_fee: 1.5
+
+two:
+  order_item: MyString
+  purchase_order: two
+  item: two
+  currancy: MyString
+  quantitiy_added: 1
+  quantity_shipped: 1
+  price: 1.5
+  discount: 1.5
+  tax: 1.5
+  platform_fee: 1.5
