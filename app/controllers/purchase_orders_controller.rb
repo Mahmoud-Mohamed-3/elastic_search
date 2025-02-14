@@ -7,25 +7,52 @@ class PurchaseOrdersController < ApplicationController
   # app/controllers/purchase_orders_controller.rb
   def index
     query = params[:q].presence
-    cache_key = query.present? ? "purchase_orders_results_#{query}" : "purchase_orders_results_all"
-    GetAllOrSearchJob.perform_async(query)
-    timeout = 10
-    interval = 1
-    elapsed_time = 0
-    loop do
-      cached_result = Rails.cache.read(cache_key)
-      if cached_result.is_a?(Array)
-        @purchase_orders = cached_result.map { |po| PurchaseOrder.new(po) }
-        break
+    page = params[:page].to_i > 0 ? params[:page].to_i : 1
+    per_page = 50
+    from = (page - 1) * per_page
+
+    cache_key = query.present? ? "purchase_orders_results_#{query}_page_#{page}" : "purchase_orders_results_all_page_#{page}"
+
+    cached_result = Rails.cache.read(cache_key)
+
+    if cached_result.present?
+      @purchase_orders = cached_result.map { |po| PurchaseOrder.new(po) }
+      Rails.logger.info ">>>>>> Retrieved #{@purchase_orders.size} orders from cache (Page #{page})"
+    else
+
+      purchase_orders = if query.present?
+                          if %w[unshipped shipped confirmed].include?(query.downcase)
+                            PurchaseOrder.search(
+                              query: { term: { "status.lower" => query.downcase } },
+                              from: from,
+                              size: per_page
+                            ).records.to_a
+                          else
+                            PurchaseOrder.search(
+                              query: { term: { sales_channel: query } },
+                              from: from,
+                              size: per_page
+                            ).records.to_a
+                          end
+      else
+                          PurchaseOrder.offset(from).limit(per_page).to_a
       end
-      sleep(interval)
-      elapsed_time += interval
-      break if elapsed_time >= timeout
+
+      Rails.cache.write(
+        cache_key,
+        purchase_orders.as_json(only: [ :id, :status, :sales_channel ]),
+        expires_in: 2.hours
+      )
+      Rails.logger.info ">>>>>> Cached #{purchase_orders.size} orders with key #{cache_key}"
+
+      @purchase_orders = purchase_orders
     end
 
-    Rails.logger.info ">>>>>> Retrieved #{@purchase_orders&.size || 0} orders from cache"
     @purchase_orders ||= []
   end
+
+
+
 
 
 

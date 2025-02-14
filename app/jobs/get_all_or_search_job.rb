@@ -9,17 +9,27 @@ class GetAllOrSearchJob
 
 
     purchase_orders = if query.present?
-                        if [ "unshipped", "shipped", "confirmed" ].include?(query.downcase)
+                        if %w[unshipped shipped confirmed].include?(query.downcase)
                           PurchaseOrder.search(
                             query: {
                               bool: {
-                                filter: [
-                                  { term: { "status.lower" => query.downcase } }
-                                ]
+                                should: [
+                                  {
+                                    match: {
+                                      "status.lower" => {
+                                        query: query.downcase,
+                                        fuzziness: 1,
+                                        prefix_length: 2
+                                      }
+                                    }
+                                  }
+                                ],
+                                minimum_should_match: 1
                               }
                             },
                             size: 10000
                           ).records.to_a
+
                         else
                           PurchaseOrder.search(
                             query: {
@@ -28,7 +38,7 @@ class GetAllOrSearchJob
                                   {
                                     multi_match: {
                                       query: query,
-                                      fields: [ "sales_channel", "status.lower" ],
+                                      fields: [ "sales_channel" ],
                                       fuzziness: "AUTO",
                                       type: "best_fields"
                                     }
@@ -44,6 +54,7 @@ class GetAllOrSearchJob
                         PurchaseOrder.all.to_a
     end
 
+
     Sidekiq.logger.info ">>>>>> Found #{purchase_orders.size} purchase orders"
 
     cache_key = query.present? ? "purchase_orders_results_#{query}" : "purchase_orders_results_all"
@@ -52,3 +63,40 @@ class GetAllOrSearchJob
     Sidekiq.logger.info ">>>>>> Cached #{purchase_orders.size} orders successfully"
   end
 end
+
+
+# purchase_orders = if query.present?
+#                     if [ "unshipped", "shipped", "confirmed" ].include?(query.downcase)
+#                       PurchaseOrder.search(
+#                         query: {
+#                           bool: {
+#                             filter: [
+#                               { term: { "status.lower" => query.downcase } }
+#                             ]
+#                           }
+#                         },
+#                         size: 10000
+#                       ).records.to_a
+#                     else
+#                       PurchaseOrder.search(
+#                         query: {
+#                           bool: {
+#                             should: [
+#                               {
+#                                 multi_match: {
+#                                   query: query,
+#                                   fields: [ "sales_channel", "status.lower" ],
+#                                   fuzziness: "AUTO",
+#                                   type: "best_fields"
+#                                 }
+#                               }
+#                             ],
+#                             minimum_should_match: 1
+#                           }
+#                         },
+#                         size: 10000
+#                       ).records.to_a
+#                     end
+#                   else
+#                     PurchaseOrder.all.to_a
+#                   end
